@@ -8,6 +8,7 @@ import six
 import datetime
 from operator import itemgetter
 from pytz import timezone
+import json
 import base64
 
 home_directory = os.path.expanduser('~')
@@ -173,6 +174,20 @@ def verify_block_content(block):
         print('WARNING: Block timestamp lies in the future')
 
     return signature_ok & difficulty_ok & block_hash_ok & timestamp_ok
+
+
+def write_block(block):
+    name = block['block_hash']
+    block_json_string = json.dumps(block)
+    filename = os.path.join(chain_directory, '{}.json'.format(name))
+    with open(filename, 'wd') as f:
+        json.dump(block_json_string, f)
+
+def read_block(name):
+    filename = os.path.join(chain_directory, '{}.json'.format(name))
+    with open(filename, 'r') as f:
+        block = json.load(f)
+    return block
 
 
 
