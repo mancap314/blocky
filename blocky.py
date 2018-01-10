@@ -100,7 +100,7 @@ def build_block(previous_block_hash, message, recipients, difficulty=0):
     message_hash = SHA256.new(message.encode('utf8')).hexdigest()
     blockstring += str(message_hash)
     message_signature = sign(message_hash)
-    blockstring += str(message_signature)
+    blockstring += str(message_signature[0])
     blockstring += str(difficulty)
 
     with open(publicKeyPath) as f:
@@ -122,7 +122,7 @@ def build_block(previous_block_hash, message, recipients, difficulty=0):
             message_encryptions.append({'recipient': recipient, 'encrypted': encrypted_message})
             blockstring += recipient + encrypted_message
 
-    block_hash = str(SHA256.new(blockstring.encode('utf8')).hexdigest())
+    block_hash = str(SHA256.new(blockstring.strip().encode('utf8')).hexdigest())
     nonce = ''
     if difficulty > 0:
         nonce = -1
@@ -153,7 +153,7 @@ def verify_block_content(block):
         print('WARNING: block hash does not respect block difficulty')
 
     # verify block hash
-    blockstring = str(block['previous_block_hash']) + str(block['timestamp']) + str(block['message_hash']) + str(block['signature']) + str(block['difficulty']) + str(block['author'])
+    blockstring = str(block['previous_block_hash']) + str(block['timestamp']) + str(block['message_hash']) + str(block['signature'][0]) + str(block['difficulty']) + str(block['author'])
     encryptions = block['encryptions']
     encryptions = sorted(encryptions, key=itemgetter('recipient'))
     for encryption in encryptions:
@@ -178,15 +178,13 @@ def verify_block_content(block):
 
 def write_block(block):
     name = block['block_hash']
-    block_json_string = json.dumps(block)
     filename = os.path.join(chain_directory, '{}.json'.format(name))
-    with open(filename, 'wd') as f:
-        json.dump(block_json_string, f)
+    with open(filename, 'w') as f:
+        json.dump(block, f)
 
 def read_block(name):
     filename = os.path.join(chain_directory, '{}.json'.format(name))
-    with open(filename, 'r') as f:
-        block = json.load(f)
+    block = json.load(open(filename))
     return block
 
 

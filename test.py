@@ -1,4 +1,6 @@
 import blocky as b
+import blocky_1 as b1
+import blocky_2 as b2
 
 import os
 import six
@@ -9,6 +11,7 @@ from Crypto.Cipher import PKCS1_OAEP
 
 home_directory = os.path.expanduser('~')
 base_directory = os.path.join(home_directory, '.blocky')
+chain_directory = os.path.join(base_directory, 'chains')
 foreignPublicKeysDirectory = os.path.join(base_directory, 'fpkeys')
 selfkeysDirectory = os.path.join(base_directory, 'skeys')
 privatKeyPath = os.path.join(selfkeysDirectory, 'private.key')
@@ -88,3 +91,18 @@ def test_encrypt(message='voilivoilou'):
 # test_sign() #OK
 # test_decrypt() #OK
 # test_encrypt() #OK
+
+# b1.setup()
+# b1.create_self_keys()
+block = b.build_block('jaflsdfj', 'salut ca va', ['01e3f6ec6114adb93d1c2f29eeb0a2e8cb8f0f1b444fdca0f218a0b543a20a33', '0240b713e33b66f2305896e49e376712db31cb7d25c7e26688da3d20a5daec6d'], difficulty=3)
+# print(b1.verify_block_content(block)) #OK
+
+b.write_block(block)
+
+blockfiles = [f for f in os.listdir(chain_directory) if os.path.isfile(os.path.join(chain_directory, f))]
+for blockfile in blockfiles:
+    blockname = blockfile.split('.')[0]
+    block = b.read_block(blockname)
+    print(b1.verify_block_content(block))
+
+
